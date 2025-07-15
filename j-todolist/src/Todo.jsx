@@ -1,5 +1,5 @@
 import React, { use, useEffect, useRef, useState } from 'react';
-import {todoget, todopost} from './axios/api'
+import {todoDelete, todoGet, todoPost, todoPut} from './axios/api'
 import { todoGetQuery } from './axios/todoQuery';
 
 function Todo(props) {
@@ -42,19 +42,25 @@ function Todo(props) {
 
     const todoList = getQuery.isFetched ? getQuery.data.data : [];
     
-    todoList.map(() => {
-        const todo = {
-            id: todoList.todoId,
-            content: todoList.content,
-            date: todoList.date,
-            checked: false
+    useEffect(() => {
+        setTodos([])
+        if (todoList.length < 1) {
+            return;
         }
-        setTodos(prev => [...prev,todo])
-    })
+        todoList.map((todo) => {
+            const temp = {
+                id: todo.todoId,
+                content: todo.content,
+                date: todo.date,
+                checked: false
+            }
+            setTodos(prev => [...prev,temp])
+        })
+    }, [todoList])
 
-    const saveTodo = () => {
-        todopost({content: value})
-        todoGetQuery().refetch();
+    const saveTodo = async () => {
+        await todoPost({content: value})
+        await getQuery.refetch();
     }
 
     useEffect(() => {
@@ -87,6 +93,7 @@ function Todo(props) {
     }
 
     const handleSelectedRowsDeleteOnClick = () => {
+        todoDelete()
         setTodos(prev => prev.filter(todo => !todo.checked ))
     }
 
@@ -98,26 +105,20 @@ function Todo(props) {
         setSelectedModifyId(todoId),
         setModifyInputValue(todos.find(todo => todo.id === todoId).content)
     }
-
-    const modifyTodo = () => {
-        setTodos(prev => prev.map(todo => {
-            if (todo.id === selectedModifyId) {
-                return {
-                    ...todo,
-                    content: modifyInputValue,
-                }
-            }
-            return todo;
-        }))
-    }
     
     const handleModifyInputOnChange = e => {
         setModifyInputValue(e.target.value)
     }
 
-    const handleModifyOkOnClick = () => {
-        modifyTodo()
+    const handleModifyOkOnClick = async () => {
+        const putObject = {
+            todoId: selectedModifyId,
+            content: modifyInputValue    
+        }
+        todoPut(putObject);
+
         resetSelectedModifyId();
+        await getQuery.refetch();
     }
 
     const handleModifyCancleOnClick = () => {
@@ -155,7 +156,7 @@ function Todo(props) {
                         todos.map((todo) =>(
                             <tr key={todo.id}>
                                 <td><input type="checkbox" checked={todo.checked} onChange={(e) => handleCheckOnChange(e, todo.id)} /></td>
-                                <td>{todo.id}</td>
+                                <td>{todo.todoId}</td>
                                 <td>{selectedModifyId !== todo.id ? todo.content : <input autoFocus value={modifyInputValue} onChange={handleModifyInputOnChange} onKeyDown={e => {if (e.keyCode === 13 )handleModifyOkOnClick()}}/> }</td>
                                 <td>{todo.date}</td>
                                 <td>
@@ -169,7 +170,6 @@ function Todo(props) {
                                         </>
                                     }
                                 </td>
-                                <td>
                                     {
                                         selectedModifyId !== 0 ? (
                                             <></>
@@ -181,7 +181,6 @@ function Todo(props) {
                                             </td>
                                         )
                                     }
-                                </td>
                                     
                             </tr>
                         ))

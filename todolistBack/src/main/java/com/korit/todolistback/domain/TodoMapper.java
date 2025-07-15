@@ -8,4 +8,6 @@ import java.util.List;
 public interface TodoMapper {
     List<Todo> select ();
     int insert(Todo todo);
+
+    int update(Todo todo);
 }

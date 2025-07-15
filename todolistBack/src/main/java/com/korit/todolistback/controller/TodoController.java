@@ -2,6 +2,7 @@ package com.korit.todolistback.controller;
 
 import com.korit.todolistback.domain.TodoMapper;
 import com.korit.todolistback.service.TodoService;
+import com.korit.todolistback.todoDto.PutReqDto;
 import com.korit.todolistback.todoDto.TodoDto;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -28,5 +29,11 @@ public class TodoController {
         System.out.println(dto);
         todoService.post(dto);
         return ResponseEntity.ok("등록완료");
+    }
+
+    @PutMapping("/todos/{todoId}")
+    public ResponseEntity<?> put(@RequestBody PutReqDto dto) {
+        todoService.put(dto);
+        return ResponseEntity.ok("수정 완료");
     }
 }
