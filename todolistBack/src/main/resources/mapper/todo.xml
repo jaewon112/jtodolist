@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "https://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+
+    <mapper namespace="com.korit.todolistback.domain.TodoMapper">
+        <resultMap id="TodoMap" type="com.korit.todolistback.domain.Todo">
+            <id property="todoId" column="todo_id" />
+            <result property="content" column="content" />
+            <result property="date" column="date" />
+        </resultMap>
+    <insert id="insert" useGeneratedKeys="true" keyProperty="todoId">
+        insert into todo_tb
+        value(default, #{content}, #{date})
+    </insert>
+
+        <select id="select" resultMap="TodoMap">
+        select
+            *
+        from
+            todo_tb
+    </select>
+
+
+</mapper>
+
