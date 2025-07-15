@@ -10,6 +10,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.Date;
+import java.util.List;
 
 @RestController
 @RequestMapping("/api")
@@ -35,5 +36,17 @@ public class TodoController {
     public ResponseEntity<?> put(@RequestBody PutReqDto dto) {
         todoService.put(dto);
         return ResponseEntity.ok("수정 완료");
+    }
+
+    @DeleteMapping("/todos/{id}")
+    public ResponseEntity<?> delete(@PathVariable Integer id) {
+        todoService.delete(id);
+        return ResponseEntity.ok("삭제완료");
+    }
+    @DeleteMapping("/todos")
+    public ResponseEntity<?> checkedDelete(@RequestBody List<Integer> ids) {
+        System.out.println(ids);
+        todoService.checkedDelete(ids);
+        return ResponseEntity.ok("삭제완료");
     }
 }

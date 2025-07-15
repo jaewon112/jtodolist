@@ -23,8 +23,23 @@
         where
             todo_id = #{todoId}
     </update>
+    <delete id="delete">
+        delete from
+            todo_tb
+        where
+            todo_id = #{todoId}
+    </delete>
+    <delete id="checkedDelete" parameterType="list">
+        delete from
+            todo_tb
+        where
+            todo_id in
+        <foreach collection="todoIds" item="id" open="(" separator="," close=")">
+            #{id}
+        </foreach>
+    </delete>
 
-        <select id="select" resultMap="TodoMap">
+    <select id="select" resultMap="TodoMap">
         select
             *
         from

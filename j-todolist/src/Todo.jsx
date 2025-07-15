@@ -1,5 +1,5 @@
 import React, { use, useEffect, useRef, useState } from 'react';
-import {todoDelete, todoGet, todoPost, todoPut} from './axios/api'
+import {todoDelete, todoCheckDelete as todoPost, todoPut, todoCheckDelete} from './axios/api'
 import { todoGetQuery } from './axios/todoQuery';
 
 function Todo(props) {
@@ -45,7 +45,7 @@ function Todo(props) {
     useEffect(() => {
         setTodos([])
         if (todoList.length < 1) {
-            return;
+            return
         }
         todoList.map((todo) => {
             const temp = {
@@ -62,7 +62,7 @@ function Todo(props) {
         await todoPost({content: value})
         await getQuery.refetch();
     }
-
+    
     useEffect(() => {
         if (todos.length > 0) {
             if (todos.reduce((prev, current) => prev && current.checked, true)) {
@@ -91,16 +91,16 @@ function Todo(props) {
             return todo;
         }))
     }
-
+    
     const handleSelectedRowsDeleteOnClick = () => {
-        todoDelete()
         setTodos(prev => prev.filter(todo => !todo.checked ))
+        todoCheckDelete({data: todos.filter(todo=> todo.checked).map(checkedTodo => checkedTodo.id)})
     }
-
+    
     const resetSelectedModifyId = () => {
         setSelectedModifyId(0);
     }
-
+    
     const handleModifyOnClick = (e, todoId) => {
         setSelectedModifyId(todoId),
         setModifyInputValue(todos.find(todo => todo.id === todoId).content)
@@ -109,23 +109,23 @@ function Todo(props) {
     const handleModifyInputOnChange = e => {
         setModifyInputValue(e.target.value)
     }
-
+    
     const handleModifyOkOnClick = async () => {
         const putObject = {
             todoId: selectedModifyId,
             content: modifyInputValue    
         }
         todoPut(putObject);
-
+        
         resetSelectedModifyId();
         await getQuery.refetch();
     }
-
+    
     const handleModifyCancleOnClick = () => {
         resetSelectedModifyId();
     }
     
-
+    
     return (
         <div>
             <header>
@@ -156,7 +156,7 @@ function Todo(props) {
                         todos.map((todo) =>(
                             <tr key={todo.id}>
                                 <td><input type="checkbox" checked={todo.checked} onChange={(e) => handleCheckOnChange(e, todo.id)} /></td>
-                                <td>{todo.todoId}</td>
+                                <td>{todo.id}</td>
                                 <td>{selectedModifyId !== todo.id ? todo.content : <input autoFocus value={modifyInputValue} onChange={handleModifyInputOnChange} onKeyDown={e => {if (e.keyCode === 13 )handleModifyOkOnClick()}}/> }</td>
                                 <td>{todo.date}</td>
                                 <td>
@@ -177,7 +177,13 @@ function Todo(props) {
                                         :
                                         (
                                             <td>
-                                                <button onClick={() => {setTodos(prev => prev.filter(t => t.id !== todo.id))}}>삭제</button>
+                                                <button onClick={
+                                                    async () => 
+                                                        {
+                                                            await todoDelete(todo.id)
+                                                            await getQuery.refetch()
+                                                        }}
+                                                    >삭제</button>
                                             </td>
                                         )
                                     }

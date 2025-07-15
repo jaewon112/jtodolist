@@ -31,4 +31,12 @@ public class TodoService {
         todoMapper.update(dto.toEntity());
         return null;
     }
+
+    public Integer delete(Integer todoId) {
+        todoMapper.delete(todoId);
+        return null;
+    }
+    public void checkedDelete(List<Integer> todoIds) {
+        todoMapper.checkedDelete(todoIds);
+    }
 }
